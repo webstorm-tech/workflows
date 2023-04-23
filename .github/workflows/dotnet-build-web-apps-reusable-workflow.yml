@@ -1,0 +1,91 @@
+name: Build .NET Web Apps Workflow
+
+on:
+  workflow_call:
+    inputs:
+      dotnetVersion:
+        default: '7.0.x'
+        type: string
+      semVer:
+        required: true
+        type: string
+      solutionFile:
+        required: true
+        type: string
+      unitTestProjectFile:
+        required: true
+        type: string
+      unitTestProjectFolder:
+        required: true
+        type: string
+      webProjectFile:
+        required: true
+        type: string
+      webProjectFolder:
+        required: true
+        type: string
+    secrets:
+      CODECOV_TOKEN:
+        required: true
+
+jobs:
+  buildApplicationJob:
+    name: Build and Publish Web App Job
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ inputs.dotnetVersion }}
+
+      - name: Build Projects
+        working-directory: ./src
+        run: |
+          dotnet build ./${{ inputs.solutionFile }} \
+            --configuration Release \
+            --nologo \
+            /p:Version=${{ inputs.semVer }}
+
+      - name: Run Unit Tests
+        working-directory: ./src
+        run: |
+          dotnet test ./${{ inputs.unitTestProjectFolder }}/${{ inputs.unitTestProjectFile }} \
+            --configuration Release \
+            --no-build \
+            --verbosity normal \
+            --filter "TestCategory=UnitTest" \
+            --nologo \
+            /p:CollectCoverage=true \
+            /p:CoverletOutputFormat=opencover
+
+      - name: Collect Code Coverage
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./src/${{ inputs.unitTestProjectFolder }}/coverage.opencover.xml
+
+      - name: Publish Web API
+        working-directory: ./src
+        run: |
+          dotnet publish ./${{ inputs.webProjectFolder }}/${{ inputs.webProjectFile }} \
+            --configuration Release \
+            --no-build \
+            --output ${{ runner.temp }}/${{ inputs.webProjectFolder }} \
+            --nologo
+
+      - uses: actions/upload-artifact@v3
+        name: Upload Published Web API App
+        with:
+          name: web-api
+          path: ${{ runner.temp }}/${{ inputs.webProjectFolder }}
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v3
+        name: Upload Code Coverage to Artifacts
+        with:
+          name: code-coverage
+          path: ./src/${{ inputs.unitTestProjectFolder }}/coverage.opencover.xml
+          if-no-files-found: error
