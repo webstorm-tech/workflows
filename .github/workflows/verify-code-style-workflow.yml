@@ -1,0 +1,47 @@
+name: Verify Code Style Workflow
+
+on:
+  workflow_call:
+    inputs:
+        dotnetVersion:
+          default: '7.0.x'
+          type: string
+        solutionFilePath:
+          required: true
+          type: string
+        terraformWorkingDirectory:
+          required: true
+          type: string
+        verifyCode:
+          default: true
+          type: boolean
+        verifyTerraform:
+          default: true
+          type: boolean
+
+jobs:
+  verifyCodeStyleJob:
+    name: Verify Code Style
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v3
+        if: inputs.verifyCode
+        with:
+          dotnet-version: ${{ inputs.dotnetVersion }}
+
+      - name: Verify Code Formatting
+        if: inputs.verifyCode
+        run: dotnet format ${{ inputs.solutionFilePath }} --severity info --verify-no-changes
+
+      - name: Setup Terraform
+        if: inputs.verifyTerraform
+        uses: hashicorp/setup-terraform@v2
+        
+      - name: Verify Terraform Formatting
+        if: inputs.verifyTerraform
+        working-directory: ${{ inputs.terraformWorkingDirectory }}
+        run: terraform fmt -check
