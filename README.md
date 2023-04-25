@@ -3,7 +3,7 @@ This repository contains reusable GitHub workflows to help abstract common actio
 
 ## Build .NET Web Apps Workflow
 This workflow builds, tests, and publishes artifacts for .NET applications.
-You specify the version of .NET (which has to be a vlsupported by tthe `actions/setup-dotnet`) and it will execute the install.
+You specify the version of .NET (which has to be a value supported by the `actions/setup-dotnet` action) and it will execute the install.
 Once .NET is setup, it will perform `dotnet build` using `semVer` as the value for the `/p:Version` and `Release` for `--configuration` flags.
 After a successful build, it will perform `dotnet test` on the specified unit test project.
 Code coverage will be collected in `opencover` format and submitted to Codecov.
