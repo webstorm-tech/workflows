@@ -4,10 +4,12 @@ on:
   workflow_call:
     inputs:
       workingDirectory:
+        description: The path that contains the Terraform to run apply for.
         required: true
         type: string
     secrets:
       TF_API_TOKEN:
+        description: The Terraform Cloud API token used to create the plan.
         required: true
 
 jobs:

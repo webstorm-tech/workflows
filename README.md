@@ -128,6 +128,21 @@ tagRepoJob:
 ```
 
 ## Terraform Apply Workflow
+This is a simple workflow that uses Terraform Cloud to run `terraform apply`.
+
+### Usage
+```yaml
+terraformApplyJob:
+  name: CD - Terraform Apply Workflow
+  uses: webstorm-tech/workflows/.github/workflows/terraform-apply-workflow.yml@v1
+  with:
+    # The path that contains the Terraform to run apply for.
+    # Required: yes
+    workingDirectory: ''
+
+  # Needed to access the TF_API_TOKEN secret
+  secrets: inherit
+```
 
 ## Terraform Plan Workflow
 This workflow uses Terraform Cloud to generate a Terraform plan.
