@@ -4,6 +4,7 @@ on:
   workflow_call:
     inputs:
       semVer:
+        description: The a semantic version value to tag the repository with.
         required: true
         type: string
 
