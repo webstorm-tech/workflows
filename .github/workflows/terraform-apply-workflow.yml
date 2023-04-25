@@ -1,0 +1,42 @@
+name: Terraform Apply Workflow
+
+on:
+  workflow_call:
+    inputs:
+      workingDirectory:
+        description: The path that contains the Terraform to run apply for.
+        required: true
+        type: string
+    secrets:
+      TF_API_TOKEN:
+        description: The Terraform Cloud API token used to create the plan.
+        required: true
+
+jobs:
+  terraformApplyJob:
+    name: Terraform Apply
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          # terraform_version: 1.4.2
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: Terraform Format
+        id: terraform-fmt-step
+        working-directory: ${{ inputs.workingDirectory }}
+        run: terraform fmt -check
+
+      - name: Terraform Init
+        id: terraform-init-step
+        working-directory: ${{ inputs.workingDirectory }}
+        run: terraform init
+
+      - name: Terraform Apply
+        id: terraform-apply-step
+        working-directory: ${{ inputs.workingDirectory }}
+        run: terraform apply -auto-approve -input=false

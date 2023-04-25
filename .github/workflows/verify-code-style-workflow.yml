@@ -1,0 +1,52 @@
+name: Verify Code Style Workflow
+
+on:
+  workflow_call:
+    inputs:
+        dotnetVersion:
+          description: The version of .NET to install onto the runner.
+          default: 7.0.x
+          type: string
+        solutionFile:
+          description: The path to the solution file to perform `dotnet build` on. Ex. `./src/MySolution.sln`.
+          required: true
+          type: string
+        terraformWorkingDirectory:
+          description: The path that contains the Terraform to validate.
+          required: true
+          type: string
+        verifyCode:
+          description: A flag to indicate whether ot not to verify source code formatting. Defaults to `true`.
+          default: true
+          type: boolean
+        verifyTerraform:
+          description: A flag to indicate whether ot not to verify Terraform formatting. Defaults to `true`.
+          default: true
+          type: boolean
+
+jobs:
+  verifyCodeStyleJob:
+    name: Verify Code Style
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        if: inputs.verifyCode
+        with:
+          dotnet-version: ${{ inputs.dotnetVersion }}
+
+      - name: Verify Code Formatting
+        if: inputs.verifyCode
+        run: dotnet format ${{ inputs.solutionFile }} --severity info --verify-no-changes
+
+      - name: Setup Terraform
+        if: inputs.verifyTerraform
+        uses: hashicorp/setup-terraform@v2
+        
+      - name: Verify Terraform Formatting
+        if: inputs.verifyTerraform
+        working-directory: ${{ inputs.terraformWorkingDirectory }}
+        run: terraform fmt -check

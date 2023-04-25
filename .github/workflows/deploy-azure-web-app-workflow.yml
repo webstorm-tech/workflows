@@ -1,0 +1,36 @@
+name: Deploy Azure Web App Workflow
+
+on:
+  workflow_call:
+    inputs:
+      artifactName:
+        description: The name of the GitHub artifact to download and deploy.
+        required: true
+        type: string
+      azureAppName:
+        description: The name of the Azure App Service the application should be deployed to.
+        required: true
+        type: string
+      environment:
+        description: The name of the environment the deploy the application should be deployed to.
+        required: true
+        type: string
+
+jobs:
+  deployJob:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: ${{ inputs.artifactName }}
+          path: ${{ inputs.artifactName }}
+
+      - uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ inputs.azureAppName }}
+          package: ${{ inputs.artifactName }}

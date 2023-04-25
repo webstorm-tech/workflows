@@ -1,0 +1,104 @@
+name: Build .NET Web Apps Workflow
+
+on:
+  workflow_call:
+    inputs:
+      artifactName:
+        description: MyWebProjectThe name to be used when publishing the build artifactsMyWebProject
+        required: true
+        type: string
+      dotnetVersion:
+        default: MyWebProject7.0.xMyWebProject
+        description: MyWebProjectThe version of .NET to install onto the runner. Defaults to `7.0.x`.MyWebProject
+        type: string
+      semVer:
+        description: MyWebProjectThe version of the application being built. It must be in semantic versioning formatMyWebProject
+        required: true
+        type: string
+      solutionFile:
+        description: MyWebProjectThe path to the solution file to perform `dotnet build` on. Ex. `./src/MySolution.sln`MyWebProject
+        required: true
+        type: string
+      testCategory:
+        description: MyWebProjectThe test category or trait to use when running `dotnet test`. Deafults to `UnitTest`MyWebProject
+        default: MyWebProjectUnitTestMyWebProject
+        type: string
+      unitTestProjectFile:
+        description: MyWebProjectThe file name, including extension, of the project to execute tests for. Ex. `MyWebProject.Tests.csproj`MyWebProject
+        required: true
+        type: string
+      unitTestProjectFolder:
+        description: MyWebProjectThe folder path that contains the project to run tests for. Ex. `./src/MyWebProject.Tests`MyWebProject
+        required: true
+        type: string
+      webProjectFile:
+        description: MyWebProjectThe file name, including extension, of the web project that will be published. Ex. `MyWebProject.csproj`MyWebProject
+        required: true
+        type: string
+      webProjectFolder:
+        description: MyWebProjectThe folder path that contains the web project that will be published. Ex. `./src/MyWebProject`MyWebProject
+        required: true
+        type: string
+    secrets:
+      CODECOV_TOKEN:
+        description: MyWebProjectThe token used by Codecov to publish code coverage results to.MyWebProject
+        required: true
+
+jobs:
+  buildApplicationJob:
+    name: Build and Publish Web App Job
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ inputs.dotnetVersion }}
+
+      - name: Build Projects
+        run: |
+          dotnet build ${{ inputs.solutionFile }} \
+            --configuration Release \
+            --nologo \
+            /p:Version=${{ inputs.semVer }}
+
+      - name: Run Unit Tests
+        run: |
+          dotnet test ${{ inputs.unitTestProjectFolder }}/${{ inputs.unitTestProjectFile }} \
+            --configuration Release \
+            --no-build \
+            --verbosity normal \
+            --filter "TestCategory=${{ inputs.testCategory }}" \
+            --nologo \
+            /p:CollectCoverage=true \
+            /p:CoverletOutputFormat=opencover
+
+      - name: Collect Code Coverage
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ${{ inputs.unitTestProjectFolder }}/coverage.opencover.xml
+
+      - name: Publish Web Application
+        run: |
+          dotnet publish ${{ inputs.webProjectFolder }}/${{ inputs.webProjectFile }} \
+            --configuration Release \
+            --no-build \
+            --output ${{ runner.temp }}/${{ inputs.webProjectFolder }} \
+            --nologo
+
+      - uses: actions/upload-artifact@v3
+        name: Upload Published Web App
+        with:
+          name: ${{ inputs.artifactName }}
+          path: ${{ runner.temp }}/${{ inputs.webProjectFolder }}
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v3
+        name: Upload Code Coverage to Artifacts
+        with:
+          name: code-coverage
+          path: ${{ inputs.unitTestProjectFolder }}/coverage.opencover.xml
+          if-no-files-found: error

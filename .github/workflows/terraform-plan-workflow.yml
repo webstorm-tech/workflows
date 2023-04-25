@@ -1,0 +1,97 @@
+name: Terraform Plan Workflow
+
+on:
+  workflow_call:
+    inputs:
+      workingDirectory:
+        description: The path that contains the Terraform to create a plan for.
+        required: true
+        type: string
+    secrets:
+      TF_API_TOKEN:
+        description: The Terraform Cloud API token used to create the plan.
+        required: true
+
+jobs:
+  terraformPlanJob:
+    name: Terraform Plan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          # terraform_version: 1.4.2
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: Terraform Format
+        id: terraform-fmt-step
+        working-directory: ${{ inputs.workingDirectory }}
+        run: terraform fmt -check
+
+      - name: Terraform Init
+        id: terraform-init-step
+        working-directory: ${{ inputs.workingDirectory }}
+        run: terraform init
+
+      - name: Terraform Validate
+        id: terraform-validate-step
+        working-directory: ${{ inputs.workingDirectory }}
+        run: terraform validate -no-color
+
+      - name: Terraform Plan
+        id: terraform-plan-step
+        working-directory: ${{ inputs.workingDirectory }}
+        run: terraform plan -no-color -input=false
+        continue-on-error: true
+      
+      - name: Create Summary String
+        id: summary-string-step
+        env:
+          TERRAFORM_PLAN: "${{ steps.terraform-plan-step.outputs.stdout }}"
+        run: |
+          delimiter="$(openssl rand -hex 8)"
+          echo "summary<<${delimiter}" >> $GITHUB_OUTPUT
+          echo "#### Terraform Format and Style :paintbrush: \`${{ steps.terraform-fmt-step.outcome }}\`" >> $GITHUB_OUTPUT
+          echo "#### Terraform Initialization :gear: \`${{ steps.terraform-init-step.outcome }}\`" >> $GITHUB_OUTPUT
+          echo "#### Terraform Plan :book:\`${{ steps.terraform-plan-step.outcome }}\`" >> $GITHUB_OUTPUT
+          echo "#### Terraform Validation :robot:\`${{ steps.terraform-validate-step.outcome }}\`" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "<details><summary>Show Plan</summary>" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "\`\`\`terraform" >> $GITHUB_OUTPUT
+          echo "$TERRAFORM_PLAN" >> $GITHUB_OUTPUT
+          echo "\`\`\`" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "</details>" >> $GITHUB_OUTPUT
+          echo "${delimiter}" >> $GITHUB_OUTPUT
+
+      - name: Publish Terraform Plan to Task Summary
+        env:
+          SUMMARY: ${{ steps.summary-string-step.outputs.summary }}
+        run: |
+          echo "$SUMMARY" >> $GITHUB_STEP_SUMMARY
+
+      - name: Update Pull Request
+        id: update-pr-step
+        uses: actions/github-script@v6
+        if: github.event_name == 'pull_request'
+        env:
+          SUMMARY: ${{ steps.summary-string-step.outputs.summary }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const output = `${process.env.SUMMARY}`;
+      
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
+
+      - name: Terraform Plan Status
+        if: steps.terraform-plan-step.outcome == 'failure'
+        run: exit 1

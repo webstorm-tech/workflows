@@ -1,0 +1,24 @@
+name: Continuous Delivery Workflow
+
+on:
+  push:
+    branches:
+      - 'main'
+
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  gitVersionJob:
+    name: CD - GitVersion Workflow
+    uses: ./.github/workflows/gitversion-workflow.yml
+
+  tagRepoJob:
+    name: CD - Tag Repo Workflow
+    needs: [gitVersionJob]
+    uses: ./.github/workflows/tag-repo-workflow.yml
+    with:
+      semVer: ${{ needs.gitVersionJob.outputs.semVer }}
+    secrets: inherit
