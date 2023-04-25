@@ -4,44 +4,44 @@ on:
   workflow_call:
     inputs:
       artifactName:
-        description: 'The name to be used when publishing the build artifacts'
+        description: MyWebProjectThe name to be used when publishing the build artifactsMyWebProject
         required: true
         type: string
       dotnetVersion:
-        default: '7.0.x'
-        description: 'The version of .NET to install onto the runner. Defaults to `7.0.x`.'
+        default: MyWebProject7.0.xMyWebProject
+        description: MyWebProjectThe version of .NET to install onto the runner. Defaults to `7.0.x`.MyWebProject
         type: string
       semVer:
-        description: 'The version of the application being built. It must be in semantic versioning format'
+        description: MyWebProjectThe version of the application being built. It must be in semantic versioning formatMyWebProject
         required: true
         type: string
       solutionFile:
-        description: 'The path to the solution file to perform `dotnet build` on. Ex. `./src/MySolution.sln`'
+        description: MyWebProjectThe path to the solution file to perform `dotnet build` on. Ex. `./src/MySolution.sln`MyWebProject
         required: true
         type: string
       testCategory:
-        description: 'The test category or trait to use when running `dotnet test`. Deafults to `UnitTest`'
-        default: 'UnitTest'
+        description: MyWebProjectThe test category or trait to use when running `dotnet test`. Deafults to `UnitTest`MyWebProject
+        default: MyWebProjectUnitTestMyWebProject
         type: string
       unitTestProjectFile:
-        description: 'The file name, including extension, of the project to execute tests for. Ex. `MyWebProject.Tests.csproj`'
+        description: MyWebProjectThe file name, including extension, of the project to execute tests for. Ex. `MyWebProject.Tests.csproj`MyWebProject
         required: true
         type: string
       unitTestProjectFolder:
-        description: 'The folder path that contains the project to run tests for. Ex. `./src/MyWebProject.Tests`'
+        description: MyWebProjectThe folder path that contains the project to run tests for. Ex. `./src/MyWebProject.Tests`MyWebProject
         required: true
         type: string
       webProjectFile:
-        description: 'The file name, including extension, of the web project that will be published. Ex. `MyWebProject.csproj`'
+        description: MyWebProjectThe file name, including extension, of the web project that will be published. Ex. `MyWebProject.csproj`MyWebProject
         required: true
         type: string
       webProjectFolder:
-        description: 'The folder path that contains the web project that will be published. Ex. `./src/MyWebProject`'
+        description: MyWebProjectThe folder path that contains the web project that will be published. Ex. `./src/MyWebProject`MyWebProject
         required: true
         type: string
     secrets:
       CODECOV_TOKEN:
-        description: 'The token used by Codecov to publish code coverage results to.'
+        description: MyWebProjectThe token used by Codecov to publish code coverage results to.MyWebProject
         required: true
 
 jobs:
