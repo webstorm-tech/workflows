@@ -117,7 +117,7 @@ This workflow will need repository write permissions and access to the `GITHUB_T
 ```yaml
 tagRepoJob:
   name: CD - Tag Repo Workflow
-  uses: webstorm-tech/workflows/.github/workflows/tag-repo-reusable-workflow.yml
+  uses: webstorm-tech/workflows/.github/workflows/tag-repo-workflow.yml@v1
   with:
     # The a semantic version value to tag the repository with.
     # Required: yes
@@ -130,6 +130,23 @@ tagRepoJob:
 ## Terraform Apply Workflow
 
 ## Terraform Plan Workflow
+This workflow uses Terraform Cloud to generate a Terraform plan.
+After it generates the plan, the details are then updated as part of the step summary in GitHub Actions.
+If the plan is being ran as part of a pull request, it will add a comment to the PR with the details of the plan.
+
+### Usage
+```yaml
+terraformPlanJob:
+  name: PR - Terraform Plan Workflow
+  uses: webstorm-tech/workflows/.github/workflows/terraform-plan-workflow.yml@v1
+  with:
+    # The path that contains the Terraform to create a plan for.
+    # Required: yes
+    workingDirectory: ''
+
+  # Needed to access the TF_API_TOKEN secret
+  secrets: inherit
+```
 
 ## Verify Code Style Workflow
 This workflow will validating both .NET source code and Terraform code.
@@ -140,7 +157,7 @@ You can set flags to turn either checks off depending on individual needs.
 ```yaml
 verifyCodeStyleJob:
   name: PR - Verify Code Style Workflow
-  uses: webstorm-tech/workflows/.github/workflows/verify-code-style-reusable-workflow.yml
+  uses: webstorm-tech/workflows/.github/workflows/verify-code-style-workflow.yml@v1
   with:
     # The version of .NET to install onto the runner.
     # Default: 7.0.x
