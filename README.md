@@ -109,12 +109,59 @@ gitVersionJob:
 |`shortSha`              |The first 7 characters of the Git commit SHA                 |`28c8531`                  |
 
 ## Tag Repo Workflow
+This workflow simply creates a Git Tag using the GitHub API using the value passed into it.
+It's assumed that the value is some sort of semantic version as it prefixes a `v` to the value of the tag.
+This workflow will need repository write permissions and access to the `GITHUB_TOKEN` secret to create the tag.
+
+### Usage
+```yaml
+tagRepoJob:
+  name: CD - Tag Repo Workflow
+  uses: webstorm-tech/workflows/.github/workflows/tag-repo-reusable-workflow.yml
+  with:
+    # The a semantic version value to tag the repository with.
+    # Required: yes
+    semVer: ''
+
+  # Needed to access the GITHUB_TOKEN
+  secrets: inherit
+```
 
 ## Terraform Apply Workflow
 
 ## Terraform Plan Workflow
 
 ## Verify Code Style Workflow
+This workflow will validating both .NET source code and Terraform code.
+.NET Code is validated using `dotnet format` and Terraform is validated using `terraform fmt -check`.
+You can set flags to turn either checks off depending on individual needs.
+
+### Usage
+```yaml
+verifyCodeStyleJob:
+  name: PR - Verify Code Style Workflow
+  uses: webstorm-tech/workflows/.github/workflows/verify-code-style-reusable-workflow.yml
+  with:
+    # The version of .NET to install onto the runner.
+    # Default: 7.0.x
+    dotnetVersion: ''
+
+    # The path to the solution file to perform `dotnet build` on. Ex. `./src/MySolution.sln`
+    # Required: yes
+    solutionFile: ''
+
+    # The path that contains the Terraform to validate
+    # Required: yes
+    terraformWorkingDirectory: ''
+
+    # A flag to indicate whether ot not to verify source code formatting.
+    # Default: true
+    verifyCode: true
+
+    # A flag to indicate whether ot not to verify Terraform formatting.
+    # Default: true
+    verifyTerraform: true
+```
 
 # License
 
