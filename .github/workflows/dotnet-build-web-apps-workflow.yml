@@ -3,29 +3,45 @@ name: Build .NET Web Apps Workflow
 on:
   workflow_call:
     inputs:
+      artifactName:
+        description: 'The name to be used when publishing the build artifacts'
+        required: true
+        type: string
       dotnetVersion:
         default: '7.0.x'
+        description: 'The version of .NET to install onto the runner. Defaults to `7.0.x`.'
         type: string
       semVer:
+        description: 'The version of the application being built. It must be in semantic versioning format'
         required: true
         type: string
       solutionFile:
+        description: 'The path to the solution file to perform `dotnet build` on. Ex. `./src/MySolution.sln`'
         required: true
         type: string
+      testCategory:
+        description: 'The test category or trait to use when running `dotnet test`. Deafults to `UnitTest`'
+        default: 'UnitTest'
+        type: string
       unitTestProjectFile:
+        description: 'The file name, including extension, of the project to execute tests for. Ex. `MyWebProject.Tests.csproj`'
         required: true
         type: string
       unitTestProjectFolder:
+        description: 'The folder path that contains the project to run tests for. Ex. `./src/MyWebProject.Tests`'
         required: true
         type: string
       webProjectFile:
+        description: 'The file name, including extension, of the web project that will be published. Ex. `MyWebProject.csproj`'
         required: true
         type: string
       webProjectFolder:
+        description: 'The folder path that contains the web project that will be published. Ex. `./src/MyWebProject`'
         required: true
         type: string
     secrets:
       CODECOV_TOKEN:
+        description: 'The token used by Codecov to publish code coverage results to.'
         required: true
 
 jobs:
@@ -36,27 +52,25 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Setup .NET Core
+      - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: ${{ inputs.dotnetVersion }}
 
       - name: Build Projects
-        working-directory: ./src
         run: |
-          dotnet build ./${{ inputs.solutionFile }} \
+          dotnet build ${{ inputs.solutionFile }} \
             --configuration Release \
             --nologo \
             /p:Version=${{ inputs.semVer }}
 
       - name: Run Unit Tests
-        working-directory: ./src
         run: |
-          dotnet test ./${{ inputs.unitTestProjectFolder }}/${{ inputs.unitTestProjectFile }} \
+          dotnet test ${{ inputs.unitTestProjectFolder }}/${{ inputs.unitTestProjectFile }} \
             --configuration Release \
             --no-build \
             --verbosity normal \
-            --filter "TestCategory=UnitTest" \
+            --filter "TestCategory=${{ inputs.testCategory }}" \
             --nologo \
             /p:CollectCoverage=true \
             /p:CoverletOutputFormat=opencover
@@ -65,21 +79,20 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./src/${{ inputs.unitTestProjectFolder }}/coverage.opencover.xml
+          files: ${{ inputs.unitTestProjectFolder }}/coverage.opencover.xml
 
-      - name: Publish Web API
-        working-directory: ./src
+      - name: Publish Web Application
         run: |
-          dotnet publish ./${{ inputs.webProjectFolder }}/${{ inputs.webProjectFile }} \
+          dotnet publish ${{ inputs.webProjectFolder }}/${{ inputs.webProjectFile }} \
             --configuration Release \
             --no-build \
             --output ${{ runner.temp }}/${{ inputs.webProjectFolder }} \
             --nologo
 
       - uses: actions/upload-artifact@v3
-        name: Upload Published Web API App
+        name: Upload Published Web App
         with:
-          name: web-api
+          name: ${{ inputs.artifactName }}
           path: ${{ runner.temp }}/${{ inputs.webProjectFolder }}
           if-no-files-found: error
 
@@ -87,5 +100,5 @@ jobs:
         name: Upload Code Coverage to Artifacts
         with:
           name: code-coverage
-          path: ./src/${{ inputs.unitTestProjectFolder }}/coverage.opencover.xml
+          path: ${{ inputs.unitTestProjectFolder }}/coverage.opencover.xml
           if-no-files-found: error
