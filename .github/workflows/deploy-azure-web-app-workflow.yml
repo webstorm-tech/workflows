@@ -4,16 +4,17 @@ on:
   workflow_call:
     inputs:
       artifactName:
+        description: The name of the GitHub artifact to download and deploy.
         required: true
         type: string
       azureAppName:
+        description: The name of the Azure App Service the application should be deployed to.
         required: true
         type: string
-        description: The name of the Azure App Service the application should be deployed to
       environment:
+        description: The name of the environment the deploy the application should be deployed to.
         required: true
         type: string
-        description: The name of the environment the deploy the application should be deployed to
 
 jobs:
   deployJob:
@@ -32,4 +33,4 @@ jobs:
       - uses: azure/webapps-deploy@v2
         with:
           app-name: ${{ inputs.azureAppName }}
-          package: web-api
+          package: ${{ inputs.artifactName }}
