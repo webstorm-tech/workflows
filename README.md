@@ -72,4 +72,4 @@ buildApplicationJob:
 
 # License
 
-The scripts and documentation in this project are released under the [MIT License](LICENSE)
+All materinal in this repository/project are released under the [MIT License](LICENSE)
