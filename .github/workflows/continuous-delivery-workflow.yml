@@ -37,13 +37,13 @@ jobs:
               await github.rest.git.getRef({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                ref: 'refs/tags/v${{ needs.gitVersionJob.outputs.major }}'
+                ref: 'tags/v${{ needs.gitVersionJob.outputs.major }}'
               })
 
               await github.rest.git.deleteRef({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                ref: 'refs/tags/v${{ needs.gitVersionJob.outputs.major }}'
+                ref: 'tags/v${{ needs.gitVersionJob.outputs.major }}'
               })
             } catch (error) {
               if (error.status === 404) {
@@ -65,13 +65,13 @@ jobs:
               await github.rest.git.getRef({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                ref: 'refs/tags/v${{ needs.gitVersionJob.outputs.majorMinor }}'
+                ref: 'tags/v${{ needs.gitVersionJob.outputs.majorMinor }}'
               })
 
               await github.rest.git.deleteRef({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                ref: 'refs/tags/v${{ needs.gitVersionJob.outputs.majorMinor }}'
+                ref: 'tags/v${{ needs.gitVersionJob.outputs.majorMinor }}'
               })
             } catch (error) {
               if (error.status === 404) {
