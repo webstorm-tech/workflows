@@ -15,10 +15,28 @@ jobs:
     name: CD - GitVersion Workflow
     uses: ./.github/workflows/gitversion-workflow.yml
 
-  tagRepoJob:
-    name: CD - Tag Repo Workflow
+  # tagRepoSemVerJob:
+  #   name: CD - Tag Repo w/ SemVer
+  #   needs: [gitVersionJob]
+  #   uses: ./.github/workflows/tag-repo-workflow.yml
+  #   with:
+  #     semVer: ${{ needs.gitVersionJob.outputs.semVer }}
+  #   secrets: inherit
+
+  tagRepoMajorJob:
+    name: Tag Repo w/ Major
     needs: [gitVersionJob]
-    uses: ./.github/workflows/tag-repo-workflow.yml
-    with:
-      semVer: ${{ needs.gitVersionJob.outputs.semVer }}
-    secrets: inherit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create tag
+        uses: actions/github-script@v6
+        with:
+          script: |
+            
+            tag = github.rest.git.getRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/tags/v2'
+            })
+
+            console.log(tag)
