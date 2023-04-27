@@ -32,11 +32,28 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            
-            tag = github.rest.git.getRef({
+            try {
+              await github.rest.git.getRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: 'refs/tags/v${{ needs.gitVersionJob.outputs.major }}'
+              })
+
+              await github.rest.git.deleteRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: 'refs/tags/v${{ needs.gitVersionJob.outputs.major }}'
+              })
+            } catch (err) {
+              if(err.constructor === HttpError && err.status === 404) {
+                console.log("Tag not found")
+              }
+            }
+
+            github.rest.git.createRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              ref: 'refs/tags/v2'
+              ref: 'refs/tags/v${{ needs.gitVersionJob.outputs.major }}',
+              sha: context.sha
             })
-
-            console.log(tag)
+            
