@@ -167,6 +167,8 @@ terraformPlanJob:
 This workflow will validating both .NET source code and Terraform code.
 .NET Code is validated using `dotnet format` and Terraform is validated using `terraform fmt -check`.
 You can set flags to turn either checks off depending on individual needs.
+Since you can conditionally run for your source code or Terraform, the `solutionFile` and `terraformWorkingDirectory` are not required inputs.
+However, you will need to specify a value for one or both depending which verify inputs are set to `true`.
 
 ### Usage
 ```yaml
@@ -179,11 +181,9 @@ verifyCodeStyleJob:
     dotnetVersion: ''
 
     # The path to the solution file to perform `dotnet build` on. Ex. `./src/MySolution.sln`
-    # Required: yes
     solutionFile: ''
 
     # The path that contains the Terraform to validate
-    # Required: yes
     terraformWorkingDirectory: ''
 
     # A flag to indicate whether ot not to verify source code formatting.
