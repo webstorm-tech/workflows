@@ -15,10 +15,76 @@ jobs:
     name: CD - GitVersion Workflow
     uses: ./.github/workflows/gitversion-workflow.yml
 
-  tagRepoJob:
-    name: CD - Tag Repo Workflow
+  tagRepoSemVerJob:
+    name: CD - Tag Repo w/ SemVer
     needs: [gitVersionJob]
     uses: ./.github/workflows/tag-repo-workflow.yml
     with:
       semVer: ${{ needs.gitVersionJob.outputs.semVer }}
     secrets: inherit
+
+  tagRepoMajorJob:
+    name: Tag Repo w/ Major
+    needs: [gitVersionJob]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create tag
+        uses: actions/github-script@v6
+        with:
+          script: |
+            console.log("Creating v${{ needs.gitVersionJob.outputs.major }} tag")
+            try {
+              await github.rest.git.getRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: 'refs/tags/v${{ needs.gitVersionJob.outputs.major }}'
+              })
+
+              await github.rest.git.deleteRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: 'refs/tags/v${{ needs.gitVersionJob.outputs.major }}'
+              })
+            } catch (error) {
+              if (error.status === 404) {
+                console.log("Tag does not exist")
+              } else {
+                throw error;
+              }
+            }
+
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/tags/v${{ needs.gitVersionJob.outputs.major }}',
+              sha: context.sha
+            })
+
+            console.log("Creating v${{ needs.gitVersionJob.outputs.majorMinor }} tag")
+            try {
+              await github.rest.git.getRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: 'refs/tags/v${{ needs.gitVersionJob.outputs.majorMinor }}'
+              })
+
+              await github.rest.git.deleteRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: 'refs/tags/v${{ needs.gitVersionJob.outputs.majorMinor }}'
+              })
+            } catch (error) {
+              if (error.status === 404) {
+                console.log("Tag does not exist")
+              } else {
+                throw error;
+              }
+            }
+
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/tags/v${{ needs.gitVersionJob.outputs.majorMinor }}',
+              sha: context.sha
+            })
+            
