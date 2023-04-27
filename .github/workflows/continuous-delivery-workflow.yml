@@ -32,27 +32,29 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            console.log("Creating v${{ needs.gitVersionJob.outputs.major }} tag")
             try {
+              console.log("Chekcing if v${{ needs.gitVersionJob.outputs.major }} tag exists...")
               await github.rest.git.getRef({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                ref: 'refs/tags/v${{ needs.gitVersionJob.outputs.major }}'
+                ref: 'tags/v${{ needs.gitVersionJob.outputs.major }}'
               })
 
+              console.log("Deleteing the v${{ needs.gitVersionJob.outputs.major }} tag...")
               await github.rest.git.deleteRef({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                ref: 'refs/tags/v${{ needs.gitVersionJob.outputs.major }}'
+                ref: 'tags/v${{ needs.gitVersionJob.outputs.major }}'
               })
             } catch (error) {
               if (error.status === 404) {
-                console.log("Tag does not exist")
+                console.log("The v${{ needs.gitVersionJob.outputs.major }} tag does not exist...")
               } else {
                 throw error;
               }
             }
 
+            console.log("Creating the v${{ needs.gitVersionJob.outputs.major }} tag...")
             github.rest.git.createRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -60,27 +62,29 @@ jobs:
               sha: context.sha
             })
 
-            console.log("Creating v${{ needs.gitVersionJob.outputs.majorMinor }} tag")
             try {
+              console.log("Chekcing if v${{ needs.gitVersionJob.outputs.majorMinor }} tag exists...")
               await github.rest.git.getRef({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                ref: 'refs/tags/v${{ needs.gitVersionJob.outputs.majorMinor }}'
+                ref: 'tags/v${{ needs.gitVersionJob.outputs.majorMinor }}'
               })
 
+              console.log("Deleteing the v${{ needs.gitVersionJob.outputs.majorMinor }} tag...")
               await github.rest.git.deleteRef({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                ref: 'refs/tags/v${{ needs.gitVersionJob.outputs.majorMinor }}'
+                ref: 'tags/v${{ needs.gitVersionJob.outputs.majorMinor }}'
               })
             } catch (error) {
               if (error.status === 404) {
-                console.log("Tag does not exist")
+                console.log("The v${{ needs.gitVersionJob.outputs.majorMinor }} tag does not exist...")
               } else {
                 throw error;
               }
             }
 
+            console.log("Creating the v${{ needs.gitVersionJob.outputs.majorMinor }} tag...")
             github.rest.git.createRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
