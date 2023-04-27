@@ -45,6 +45,7 @@ jobs:
                 ref: 'refs/tags/v${{ needs.gitVersionJob.outputs.major }}'
               })
             } catch (err) {
+              console.log(typeof err)
               if(err.constructor === HttpError && err.status === 404) {
                 console.log("Tag not found")
               }
