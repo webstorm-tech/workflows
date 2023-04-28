@@ -1,0 +1,90 @@
+name: Build Container Workflow
+
+on:
+  workflow_call:
+    inputs:
+      dockerfile:
+        description: The path to the Docker file
+        required: true
+        type: string
+      dockerNamespace:
+        description: The the path within the repository to push the container image too.
+        required: true
+        type: string
+      dockerRegistry:
+        description: The Docker registry to push the container image to. Ex. `ghcr.io`
+        required: true
+        type: string
+      dockerRepository:
+        description: The repository with in the registry to push the container image too.
+        required: true
+        type: string
+      dockerWorkingDirectory:
+        description: The context or working directory to be used with `docker build`.
+        required: true
+        type: string
+      majorVersion:
+        description: The major part of the semantic version. Ex. `3`
+        required: true
+        type: string
+      majorMinorVersion:
+        description: The major and minor parts of the semantic version. Ex. `3.1`
+        required: true
+        type: string
+      pushContainerImage:
+        default: true
+        description: A flag to indicate if the container image should be pushed or not. Defaults to `true`
+        type: boolean
+      pushLatestTag:
+        default: true
+        description: A flag to indicate if the `latest` should be pushed or not. Defaults to `true`
+        type: boolean
+      semVer:
+        description: The full semantic version of. Ex. `3.1.2`
+        required: true
+        type: string
+    secrets:
+      REGISTRY_TOKEN:
+        description: The token to use when logging into the container registry.
+        required: true
+
+jobs:
+  buildDockerContainerJob:
+    name: Build Docker Container
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build Container Image
+        env:
+          REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
+        run: |
+          docker build \
+            --tag ${{ inputs.dockerRegistry }}/${{ inputs.dockerRepository }}/${{ inputs.dockerNamespace }}:${{ inputs.semVer }} \
+            --tag ${{ inputs.dockerRegistry }}/${{ inputs.dockerRepository }}/${{ inputs.dockerNamespace }}:${{ inputs.majorMinorVersion }} \
+            --tag ${{ inputs.dockerRegistry }}/${{ inputs.dockerRepository }}/${{ inputs.dockerNamespace }}:${{ inputs.majorVersion }} \
+            --tag ${{ inputs.dockerRegistry }}/${{ inputs.dockerRepository }}/${{ inputs.dockerNamespace }}:latest \
+            --file ${{ inputs.dockerfile }} \
+            --build-arg CONTAINER_VERSION=${{ inputs.semVer }} \
+            --build-arg REGISTRY_TOKEN=$REGISTRY_TOKEN \
+            ${{ inputs.dockerWorkingDirectory }}
+
+      - name: Docker Login to Registry
+        if: inputs.pushContainerImage || inputs.pushLatestTag
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ inputs.dockerRegistry }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Push Container Image
+        if: inputs.pushContainerImage
+        run: |
+          docker push ${{ inputs.dockerRegistry }}/${{ inputs.dockerRepository }}/${{ inputs.dockerNamespace }}:${{ inputs.semVer }}
+          docker push ${{ inputs.dockerRegistry }}/${{ inputs.dockerRepository }}/${{ inputs.dockerNamespace }}:${{ inputs.majorMinorVersion }}
+          docker push ${{ inputs.dockerRegistry }}/${{ inputs.dockerRepository }}/${{ inputs.dockerNamespace }}:${{ inputs.majorVersion }}
+
+      - name: Move Latest Tag
+        if: inputs.pushLatestTag
+        run: |
+          docker push ${{ inputs.dockerRegistry }}/${{ inputs.dockerRepository }}/${{ inputs.dockerNamespace }}:latest
