@@ -16,7 +16,7 @@ Lastly, the code coverage is published as an artifact to GitHub as well.
 buildApplicationJob:
   name: CI - Build Workflow
   needs: gitVersionJob
-  uses:  webstorm-tech/workflows/.github/workflows/dotnet-build-web-apps-workflow.yml.yml@v1
+  uses:  webstorm-tech/workflows/.github/workflows/dotnet-build-app-workflow.yml.yml@v2
   with:
     # The name to be used when publishing the build artifacts
     # Required: yes
