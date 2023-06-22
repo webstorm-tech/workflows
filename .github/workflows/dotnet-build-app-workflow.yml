@@ -1,4 +1,4 @@
-name: Build .NET Web Apps Workflow
+name: Build .NET Apps Workflow
 
 on:
   workflow_call:
@@ -20,33 +20,32 @@ on:
         required: true
         type: string
       testCategory:
+        default: 'UnitTest'
         description: The test category or trait to use when running `dotnet test`. Deafults to `UnitTest`
-        default: MyWebProjectUnitTest
         type: string
       unitTestProjectFile:
-        description: The file name, including extension, of the project to execute tests for. Ex. `MyWebProject.Tests.csproj`
-        required: true
+        default: ''
+        description: The file name, including extension, of the project to execute tests for. If omitted, no tests will be run. Ex. `MyWebProject.Tests.csproj`.
         type: string
       unitTestProjectFolder:
-        description: The folder path that contains the project to run tests for. Ex. `./src/MyWebProject.Tests`
+        default: ''
+        description: The folder path that contains the project to run tests for. If omitted, no tests will be run. Ex. `./src/MyWebProject.Tests`
+        type: string
+      publishProjectFile:
+        description: The file name, including extension, of the project that will be published. Ex. `MyWebProject.csproj`
         required: true
         type: string
-      webProjectFile:
-        description: The file name, including extension, of the web project that will be published. Ex. `MyWebProject.csproj`
-        required: true
-        type: string
-      webProjectFolder:
-        description: The folder path that contains the web project that will be published. Ex. `./src/MyWebProject`
+      publishProjectFolder:
+        description: The folder path that contains the project that will be published. Ex. `./src/MyWebProject`
         required: true
         type: string
     secrets:
       CODECOV_TOKEN:
-        description: The token used by Codecov to publish code coverage results to.
-        required: true
+        description: The token used by Codecov to publish code coverage results to. This is required if `unitTestProjectFile` and `unitTestProjectFolder` are provided.
 
 jobs:
   buildApplicationJob:
-    name: Build and Publish Web App Job
+    name: .NET Build and Publish Job
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -65,6 +64,7 @@ jobs:
             /p:Version=${{ inputs.semVer }}
 
       - name: Run Unit Tests
+        if: ${{ inputs.unitTestProjectFile != '' && inputs.unitTestProjectFolder != '' }}
         run: |
           dotnet test ${{ inputs.unitTestProjectFolder }}/${{ inputs.unitTestProjectFile }} \
             --configuration Release \
@@ -76,27 +76,29 @@ jobs:
             /p:CoverletOutputFormat=opencover
 
       - name: Collect Code Coverage
+        if: ${{ inputs.unitTestProjectFile != '' && inputs.unitTestProjectFolder != '' }}
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ${{ inputs.unitTestProjectFolder }}/coverage.opencover.xml
 
-      - name: Publish Web Application
+      - name: Publish .NET Application
         run: |
-          dotnet publish ${{ inputs.webProjectFolder }}/${{ inputs.webProjectFile }} \
+          dotnet publish ${{ inputs.publishProjectFolder }}/${{ inputs.publishProjectFile }} \
             --configuration Release \
             --no-build \
-            --output ${{ runner.temp }}/${{ inputs.webProjectFolder }} \
+            --output ${{ runner.temp }}/${{ inputs.publishProjectFolder }} \
             --nologo
 
       - uses: actions/upload-artifact@v3
-        name: Upload Published Web App
+        name: Upload Published App Artifacts
         with:
           name: ${{ inputs.artifactName }}
-          path: ${{ runner.temp }}/${{ inputs.webProjectFolder }}
+          path: ${{ runner.temp }}/${{ inputs.publishProjectFolder }}
           if-no-files-found: error
 
       - uses: actions/upload-artifact@v3
+        if: ${{ inputs.unitTestProjectFile != '' && inputs.unitTestProjectFolder != '' }}
         name: Upload Code Coverage to Artifacts
         with:
           name: code-coverage
