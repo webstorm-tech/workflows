@@ -31,6 +31,10 @@ on:
         default: ''
         description: The folder path that contains the project to run tests for. If omitted, no tests will be run. Ex. `./src/MyWebProject.Tests`
         type: string
+      sendToCodecov:
+        default: false
+        description: A boolean value indicating if the code coverage results should be sent to Codecov. Defaults to `false`.
+        type: boolean
       publishProjectFile:
         description: The file name, including extension, of the project that will be published. Ex. `MyWebProject.csproj`
         required: true
@@ -76,7 +80,7 @@ jobs:
             /p:CoverletOutputFormat=opencover
 
       - name: Collect Code Coverage
-        if: ${{ inputs.unitTestProjectFile != '' && inputs.unitTestProjectFolder != '' }}
+        if: ${{ inputs.unitTestProjectFile != '' && inputs.unitTestProjectFolder != '' && inputs.sendToCodecov == true }}
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
