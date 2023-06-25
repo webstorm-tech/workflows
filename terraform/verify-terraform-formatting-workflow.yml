@@ -1,0 +1,25 @@
+name: Verify Code Style Workflow
+
+on:
+  workflow_call:
+    inputs:
+        terraformWorkingDirectory:
+          description: The path that contains the Terraform to validate.
+          type: string
+
+jobs:
+  verifyCodeStyleJob:
+    name: Verify Code Style
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        if: inputs.verifyTerraform
+        uses: hashicorp/setup-terraform@v2
+        
+      - name: Verify Terraform Formatting
+        if: inputs.verifyTerraform
+        working-directory: ${{ inputs.terraformWorkingDirectory }}
+        run: terraform fmt -check
