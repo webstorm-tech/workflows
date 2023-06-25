@@ -27,7 +27,7 @@ The currently available reusable workflows are:
 ## GitHub Workflows
 All reusable workflows that interact with GitHub (commonly the API) can be found in the [`github`](./github/) folder of this repository.
 The currently available reusable workflows are:
-- [Tag Repo Workflow](./git/gitversion-workflow.yml): A workflow for creating a Git Tag using the GitHub API
+- [Tag Repo Workflow](./github/tag-repo-workflow.yml): A workflow for creating a Git Tag using the GitHub API
 
 ## Terraform Workflows
 All reusable workflows that perform a Terraform action and/or command can be found in the [`terraform`](./terraform/) folder of this repository.
