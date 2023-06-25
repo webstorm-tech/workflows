@@ -1,265 +1,54 @@
 # Webstorm Technologies Workflows
-This repository contains reusable GitHub workflows to help abstract common actions performed by various applications and/or workloads.
+This repository contains reusable GitHub workflows to help abstract common steps performed by various applications and/or workloads.
+The workflows in this repository tend to perform specific tasks, such as building a .NET application or applying Terraform, and are meant to stand on their own.
+The goal is to limit rediction that can occur through abstraction while still harnessing the power of reusablity that abstraction offers.
 
-## Build .NET Apps Workflow
-This workflow builds, tests, and publishes artifacts for .NET applications.
-You specify the version of .NET (which has to be a value supported by the `actions/setup-dotnet` action) and it will execute the install.
-Once .NET is setup, it will perform `dotnet build` using `semVer` as the value for the `/p:Version` and `Release` for `--configuration` flags.
-After a successful build and a value has been specified for both `unitTestProjectFile` and `unitTestProjectFile`, it will perform `dotnet test` on the specified unit test project.
-Code coverage will be collected in `opencover` format and submitted to Codecov if specified too.
-Next, the workflow will peform a `dotnet publish` on the specified web project.
-It will then upload the published artifacts to GitHub using the specified name.
-Lastly, the code coverage is published as an artifact to GitHub as well.
+## .NET Workflows
+All reusable workflows that target .NET applications can be found in the [`dotnet`](./dotnet/) folder of this repository.
+The currently available reusable workflows are:
+- [Build App Workflow](./dotnet/build-app-workflow.yml): A workflow that builds, tests, and publishes artifacts for a .NET application
+- [Verify Code Style Workflow](./dotnet/verify-code-style-workflow.yml): A workflow for validating .NET code styles
 
-### Usage
-```yaml
-buildApplicationJob:
-  name: CI - Build Workflow
-  needs: gitVersionJob
-  uses:  webstorm-tech/workflows/.github/workflows/dotnet-build-app-workflow.yml.yml@v2
-  with:
-    # The name to be used when publishing the build artifacts
-    # Required: yes
-    artifactName: ''
+## Azure Workflows
+All reusable workflows that target Azure can be found in the [`azure`](./azure/) folder of this repository.
+The currently available reusable workflows are:
+- [Deploy Web App Workflow](./azure/deploy-web-app-workflow.yml): A workflow for deploying a GitHub artifact to an Azure Web App Service
 
-    # The version of .NET to install onto the runner.
-    # Default: 7.0.x
-    dotnetVersion: ''
+## Docker Workflows
+All reusable workflows that target Docker can be found in the [`docker`](./docker/) folder of this repository.
+The currently available reusable workflows are:
+- [Build Container Workflow](./docker/build-container-workflow.yml): A workflow for deploying a GitHub artifact to an Azure Web App Service
 
-    # The version of the application being built. It must be in semantic versioning format
-    # Required: yes
-    semVer: ''
+## Git Workflows
+All reusable workflows that interact with the local Git repository (not GitHub) can be found in the [`git`](./git/) folder of this repository.
+The currently available reusable workflows are:
+- [GitVersion Workflow](./git/gitversion-workflow.yml): A workflow for running GitVersion and to obtain a semantic version for the repository
 
-    # The path to the solution file to perform `dotnet build` on. Ex. `./src/MySolution.sln`
-    # Required: yes
-    solutionFile: ''
+## GitHub Workflows
+All reusable workflows that interact with GitHub (commonly the API) can be found in the [`github`](./github/) folder of this repository.
+The currently available reusable workflows are:
+- [Tag Repo Workflow](./git/gitversion-workflow.yml): A workflow for creating a Git Tag using the GitHub API
 
-    # The test category or trait to use when running `dotnet test`.
-    # Default: UnitTest
-    testCategory: ''
+## Terraform Workflows
+All reusable workflows that perform a Terraform action and/or command can be found in the [`terraform`](./terraform/) folder of this repository.
+The currently available reusable workflows are:
+- [Terraform Apply Workflow](./terraform/terraform-apply-workflow.yml): A workflow for executing `terraform apply`
+- [Terraform Plan Workflow](./terraform/terraform-plan-workflow.yml): A workflow for generating a Terrform plan via `terraform plan`
+- [Verify Terraform Formatting Workflow](./terraform/terraform-apply-workflow.yml): A workflow for verifing the formatting of the Terraform in the repository
 
-    # The file name, including extension, of the project to execute tests for. Ex. `MyWebProject.Tests.proj`
-    # If omitted, no tests will be run.
-    # Default: ''
-    # Required: no
-    unitTestProjectFile: ''
+# Contributing, Bug Fixes, and Enhancements
+Instead of boiling the ocean, so to speak, these workflows have started off in the most basic and simpilest fashion.
+Meaning that they dervied from rather basic use case scenarios and are slowly evolving as the use of them increases and advanced or complex situations are encountered.
+This means that if you have suggestion for enhancements or have run into a bug, we welcome the feedback!
+We ask that you create an issue so that we can review and investigate the bug fix and/or enhancement.
+We will do our best to get each request in a timely fashion.
 
-    # The folder path that contains the project to run tests for. Ex. `./src/MyWebProject.Tests`
-    # If omitted, no tests will be run.
-    # Default: ''
-    # Required: no
-    unitTestProjectFolder: ''
+We also welcome anyone to openly contribute to this project as well!
+If you have the time and are willing to help out, simply fork the repo and make the changes yourself.
+You can then open up a PR to merge the changes back into this repository for all to enjoy your hard work and efforts.
 
-    # A boolean value indicating if the code coverage results should be sent to Codecov. Defaults to `false`.
-    # Default: false
-    # Required: no
-    sendToCodecov: false
-
-    # The file name, including extension, of the project that will be published. Ex. `MyWebProject.csproj`
-    # Required: yes
-    publishProjectFile: ''
-
-    # The folder path that contains the project that will be published. Ex. `./src/MyWebProject`
-    publishProjectFolder: ''
-
-  # This is required as the workflow needs access to the `CODECOV_TOKEN` secret
-  # Which is needed to publish code coverate results to Codecov
-  secrets:
-    CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-```
-
-## Build Container Workflow
-This workflow performs a `docker build` on the specified Dockerfile and pushes it to the specified registry.
-It will tag the image wih the sematic version (ex. `3.10.1`), the major and minor (ex. `3.10`), and the major (ex. `3`).
-If the `pushContainerImage` flag is set to `true`, it will push these tags to the container registry.
-In addition, the build will tag the image with `latest` and if the `pushLatestTag` flag is set to `true` it will push it as well.
-
-### Usage
-```yaml
-buildDockerContainerJob:
-  name: Build Docker Container
-  uses: webstorm-tech/workflows/.github/workflows/build-container-workflow.yml@v1
-  with:
-    # The path to the Docker file
-    # Required: yes
-    dockerfile: ''
-
-    # The the path within the repository to push the container image too.
-    # Required: yes
-    dockerNamespace: ''
-
-    # The Docker registry to push the container image to. Ex. `ghcr.io`
-    # Required: yes
-    dockerRegistry: ''
-
-    # The repository with in the registry to push the container image too.
-    # Required: yes
-    dockerRepository: ''
-
-    # The context or working directory to be used with `docker build`.
-    # Required: yes
-    dockerWorkingDirectory: ''
-    
-    # The major part of the semantic version. Ex. `3`
-    # Required: yes
-    majorVersion: ''
-
-    # The major and minor parts of the semantic version. Ex. `3.1`
-    # Required: yes
-    majorMinorVersion: ''
-
-    # A flag to indicate if the container image should be pushed or not.
-    # Defaults: true
-    pushContainerImage: true
-
-    # A flag to indicate if the `latest` should be pushed or not.
-    # Defaults: true
-    pushLatestTag: true
-
-semVer:
-      description: The full semantic version of. Ex. `3.1.2`
-  # This is required as the workflow needs access to the `REGISTRY_TOKEN` secret
-  # Which is the credential needed to log into the container registroy
-  secrets: inherit
-```
-
-## Deploy Azure Web App Workflow
-This workflow simply downloads the specified artifact from GitHub, logs into Azure, and deploys the artifacts to the specified web application.
-
-### Usage
-```yaml
-deployApplicationJob:
-  name: CD - Deploy Workflow
-  uses: webstorm-tech/workflows/.github/workflows/deploy-azure-web-app-workflow.yml@v1
-  with:
-    # The name of the GitHub artifact to download and deploy.
-    # Required: yes
-    artifactName: ''
-
-    # The name of the Azure App Service the application should be deployed to.
-    # Required: yes
-    azureAppName: ''
-
-    # The name of the environment the deploy the application should be deployed to.
-    # Required: yes
-    environment: ''
-
-  # This is required as the workflow needs access to the `AZURE_CREDENTIALS` secret
-  # Which must be in a format that the `azure/login` task can use as credentials
-  secrets: inherit
-```
-
-## GitVersion Workflow
-This workflow uses GitVersion to generate a semantic version for the state of the repository as a whole.
-It outputs various values that can be consumed by other actions and/or workflows.
-
-### Usage
-```yaml
-gitVersionJob:
-  name: CD - GitVersion Workflow
-  uses: webstorm-tech/workflows/.github/workflows/gitversion-reusable-workflow.yml@v1
-```
-
-### Outputs
-| Variable Name          | Description                                                 | Example                   |
-|:----------------------:|-------------------------------------------------------------|:-------------------------:|
-|`major`                 |The major version. Should be incremented on breaking changes.|`3`                        |
-|`minor`                 |The minor version. Should be incremented on new features.    |`10`                       |
-|`patch`                 |The patch version. Should be incremented on bug fixes.       |`11`                       |
-|`majorMinor`            |The major and minor version together.                        |`3.10`                     |
-|`releaseLabel`          |The major, minor, patch, and the pre-release label (if any)  |`3.10.11-beta`<br>`3.10.11`|
-|`majorMinorReleaseLabel`|The major, minor, and the pre-release label (if any)         |`3.10-beta`<br>`3.10`      |
-|`majorReleaseLabel`     |The major and the pre-release label (if any)                 |`3-beta`<br>`3`            |
-|`semVer`                |The major, minor, and patch in semantic version format       |`3.10.11`                  |
-|`shortSha`              |The first 7 characters of the Git commit SHA                 |`28c8531`                  |
-
-## Tag Repo Workflow
-This workflow simply creates a Git Tag using the GitHub API using the value passed into it.
-It's assumed that the value is some sort of semantic version as it prefixes a `v` to the value of the tag.
-This workflow will need repository write permissions and access to the `GITHUB_TOKEN` secret to create the tag.
-
-### Usage
-```yaml
-tagRepoJob:
-  name: CD - Tag Repo Workflow
-  uses: webstorm-tech/workflows/.github/workflows/tag-repo-workflow.yml@v1
-  with:
-    # The a semantic version value to tag the repository with.
-    # Required: yes
-    semVer: ''
-
-  # Needed to access the GITHUB_TOKEN
-  secrets: inherit
-```
-
-## Terraform Apply Workflow
-This is a simple workflow that uses Terraform Cloud to run `terraform apply`.
-
-### Usage
-```yaml
-terraformApplyJob:
-  name: CD - Terraform Apply Workflow
-  uses: webstorm-tech/workflows/.github/workflows/terraform-apply-workflow.yml@v1
-  with:
-    # The path that contains the Terraform to run apply for.
-    # Required: yes
-    workingDirectory: ''
-
-  # Needed to access the TF_API_TOKEN secret
-  secrets: inherit
-```
-
-## Terraform Plan Workflow
-This workflow uses Terraform Cloud to generate a Terraform plan.
-After it generates the plan, the details are then updated as part of the step summary in GitHub Actions.
-If the plan is being ran as part of a pull request, it will add a comment to the PR with the details of the plan.
-
-### Usage
-```yaml
-terraformPlanJob:
-  name: PR - Terraform Plan Workflow
-  uses: webstorm-tech/workflows/.github/workflows/terraform-plan-workflow.yml@v1
-  with:
-    # The path that contains the Terraform to create a plan for.
-    # Required: yes
-    workingDirectory: ''
-
-  # Needed to access the TF_API_TOKEN secret
-  secrets: inherit
-```
-
-## Verify Code Style Workflow
-This workflow will validating both .NET source code and Terraform code.
-.NET Code is validated using `dotnet format` and Terraform is validated using `terraform fmt -check`.
-You can set flags to turn either checks off depending on individual needs.
-Since you can conditionally run for your source code or Terraform, the `solutionFile` and `terraformWorkingDirectory` are not required inputs.
-However, you will need to specify a value for one or both depending which verify inputs are set to `true`.
-
-### Usage
-```yaml
-verifyCodeStyleJob:
-  name: PR - Verify Code Style Workflow
-  uses: webstorm-tech/workflows/.github/workflows/verify-code-style-workflow.yml@v1
-  with:
-    # The version of .NET to install onto the runner.
-    # Default: 7.0.x
-    dotnetVersion: ''
-
-    # The path to the solution file to perform `dotnet build` on. Ex. `./src/MySolution.sln`
-    solutionFile: ''
-
-    # The path that contains the Terraform to validate
-    terraformWorkingDirectory: ''
-
-    # A flag to indicate whether ot not to verify source code formatting.
-    # Default: true
-    verifyCode: true
-
-    # A flag to indicate whether ot not to verify Terraform formatting.
-    # Default: true
-    verifyTerraform: true
-```
+At this time, we do not have a formal process for reviewing and merging code back into this repository, but rest assured that we are working on it.
+Stay tuned for more details!
 
 # License
-
 All materinal in this repository/project are released under the [MIT License](LICENSE)
