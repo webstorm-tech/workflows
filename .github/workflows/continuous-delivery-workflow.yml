@@ -12,16 +12,33 @@ permissions:
 
 jobs:
   gitVersionJob:
-    name: CD - GitVersion Workflow
-    uses: ./.github/workflows/gitversion-workflow.yml
+    name: Run GitVersion
+    runs-on: ubuntu-latest
+    outputs:
+      major: ${{ steps.execute-gitversion-step.outputs.major }}
+      minor: ${{ steps.execute-gitversion-step.outputs.minor }}
+      patch: ${{ steps.execute-gitversion-step.outputs.patch }}
+      majorMinor: ${{ steps.execute-gitversion-step.outputs.major }}.${{ steps.execute-gitversion-step.outputs.minor }}
+      releaseLabel: ${{ steps.execute-gitversion-step.outputs.major }}.${{ steps.execute-gitversion-step.outputs.minor }}.${{ steps.execute-gitversion-step.outputs.patch }}${{ steps.execute-gitversion-step.outputs.preReleaseTagWithDash }}
+      majorMinorReleaseLabel: ${{ steps.execute-gitversion-step.outputs.major }}.${{ steps.execute-gitversion-step.outputs.minor }}${{ steps.execute-gitversion-step.outputs.preReleaseTagWithDash }}
+      majorReleaseLabel: ${{ steps.execute-gitversion-step.outputs.major }}${{ steps.execute-gitversion-step.outputs.preReleaseTagWithDash }}
+      semVer: ${{ steps.execute-gitversion-step.outputs.semver }}
+      shortSha: ${{ steps.execute-gitversion-step.outputs.shortSha }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-  tagRepoSemVerJob:
-    name: CD - Tag Repo w/ SemVer
-    needs: [gitVersionJob]
-    uses: ./.github/workflows/tag-repo-workflow.yml
-    with:
-      semVer: ${{ needs.gitVersionJob.outputs.semVer }}
-    secrets: inherit
+      - name: Install GitVersion
+        id: install-gitversion-step
+        uses: gittools/actions/gitversion/setup@v0.10.2
+        with:
+          versionSpec: '5.x'
+        
+      - name: Execute GitVersion
+        id: execute-gitversion-step
+        uses: gittools/actions/gitversion/execute@v0.10.2
 
   tagRepoMajorJob:
     name: Tag Repo w/ Major
