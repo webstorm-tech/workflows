@@ -3,7 +3,7 @@ name: Verify Terraform Formatting
 on:
   workflow_call:
     inputs:
-        terraformWorkingDirectory:
+        workingDirectory:
           description: The path that contains the Terraform to validate.
           type: string
 
@@ -16,10 +16,8 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Setup Terraform
-        if: inputs.verifyTerraform
         uses: hashicorp/setup-terraform@v2
         
       - name: Verify Terraform Formatting
-        if: inputs.verifyTerraform
-        working-directory: ${{ inputs.terraformWorkingDirectory }}
+        working-directory: ${{ inputs.workingDirectory }}
         run: terraform fmt -check
