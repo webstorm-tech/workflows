@@ -49,6 +49,9 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
+            // *********************************************** \\
+            // Create Major Tag                                \\
+            // *********************************************** \\
             try {
               console.log("Chekcing if v${{ needs.gitVersionJob.outputs.major }} tag exists...")
               await github.rest.git.getRef({
@@ -79,6 +82,9 @@ jobs:
               sha: context.sha
             })
 
+            // *********************************************** \\
+            // Create Major/Minor Tag                          \\
+            // *********************************************** \\
             try {
               console.log("Chekcing if v${{ needs.gitVersionJob.outputs.majorMinor }} tag exists...")
               await github.rest.git.getRef({
@@ -109,3 +115,13 @@ jobs:
               sha: context.sha
             })
             
+            // *********************************************** \\
+            // Create SemVer Tag                               \\
+            // *********************************************** \\
+            console.log("Creating the v${{ needs.gitVersionJob.outputs.semVer }} tag...")
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/tags/v${{ needs.gitVersionJob.outputs.semVer }}',
+              sha: context.sha
+            })
