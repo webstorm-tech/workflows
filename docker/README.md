@@ -9,7 +9,7 @@ In addition, the build will tag the image with `latest` and if the `pushLatestTa
 ### Usage
 ```yaml
 buildDockerContainerJob:
-  name: Build Docker Container
+  name: Docker - Build Container
   uses: webstorm-tech/.github/workflows/docker-build-container-workflow.yml@v5
   with:
     # The path to the Docker file

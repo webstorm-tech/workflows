@@ -6,7 +6,7 @@ This workflow simply downloads the specified artifact from GitHub, logs into Azu
 ### Usage
 ```yaml
 deployApplicationJob:
-  name: CD - Deploy Workflow
+  name: Azure - Deploy Web App Workflow
   uses: webstorm-tech/workflows/.github/workflows/azure-deploy-web-app-workflow.yml@v5
   with:
     # The name of the GitHub artifact to download and deploy.

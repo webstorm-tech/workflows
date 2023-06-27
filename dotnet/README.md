@@ -13,7 +13,7 @@ Lastly, the code coverage is published as an artifact to GitHub as well.
 ### Usage
 ```yaml
 buildApplicationJob:
-  name: CI - Build Workflow
+  name: .NET - Build App Workflow
   needs: gitVersionJob
   uses:  webstorm-tech/.github/workflows/dotnet-build-app-workflow.yml.yml@v5
   with:
