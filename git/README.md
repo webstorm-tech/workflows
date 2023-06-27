@@ -7,8 +7,8 @@ It outputs various values that can be consumed by other actions and/or workflows
 ### Usage
 ```yaml
 gitVersionJob:
-  name: GitVersion Workflow
-  uses: webstorm-tech/workflows/git/gitversion-workflow.yml@v4
+  name: Git - GitVersion Workflow
+  uses: webstorm-tech/.github/workflows/gitversion-workflow.yml@v5
 ```
 
 ### Outputs

@@ -6,8 +6,8 @@ This is a simple workflow that uses Terraform Cloud to run `terraform apply`.
 ### Usage
 ```yaml
 terraformApplyJob:
-  name: CD - Terraform Apply Workflow
-  uses: webstorm-tech/workflows/terraform/terraform-apply-workflow.yml@v4
+  name: Terraform - Apply Workflow
+  uses: webstorm-tech/workflows/.github/workflows/terraform-apply-workflow.yml@v5
   with:
     # The path that contains the Terraform to run apply for.
     # Required: yes
@@ -15,6 +15,21 @@ terraformApplyJob:
 
   # Needed to access the TF_API_TOKEN secret
   secrets: inherit
+```
+
+## Terraform Formatting Check Workflow
+This workflow will check to see if the Terraform meets the style standards using the `terraform fmt -check` command.
+If there are not issues, the workflow will succeed, otherwise it will report a failure.
+
+### Usage
+```yaml
+verifyCodeStyleJob:
+  name: Terraform - Check Formatting
+  uses: webstorm-tech/workflows/.github/workflows/terraform-formatting-check-workflow.yml@v5
+  with:
+    # The path that contains the Terraform to check.
+    # Required: yes
+    workingDirectory: ''
 ```
 
 ## Terraform Plan Workflow
@@ -25,8 +40,8 @@ If the plan is being ran as part of a pull request, it will add a comment to the
 ### Usage
 ```yaml
 terraformPlanJob:
-  name: PR - Terraform Plan Workflow
-  uses: webstorm-tech/workflows/terraform/terraform-plan-workflow.yml@v4
+  name: Terraform - Plan Workflow
+  uses: webstorm-tech/workflows/.github/workflows/terraform-plan-workflow.yml@v5
   with:
     # The path that contains the Terraform to create a plan for.
     # Required: yes
@@ -34,19 +49,4 @@ terraformPlanJob:
 
   # Needed to access the TF_API_TOKEN secret
   secrets: inherit
-```
-
-## Verify Terraform Formatting Workflow
-This workflow will check to see if the Terraform meets the style standards using the `terraform fmt -check` command.
-If there are not issues, the workflow will succeed, otherwise it will report a failure.
-
-### Usage
-```yaml
-verifyCodeStyleJob:
-  name: PR - Verify Code Style Workflow
-  uses: webstorm-tech/workflows/terraform/verify-terraform-formatting-workflow.yml@v4
-  with:
-    # The path that contains the Terraform to check.
-    # Required: yes
-    workingDirectory: ''
 ```
