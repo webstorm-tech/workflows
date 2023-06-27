@@ -33,8 +33,8 @@ The currently available reusable workflows are:
 Documentation for all reusable workflows that perform a Terraform action and/or command can be found in the [`terraform`](./terraform/) folder of this repository.
 The currently available reusable workflows are:
 - [Terraform Apply Workflow](./.github/workflows/terraform-apply-workflow.yml): A workflow for executing `terraform apply`
+- [Terraform Formatting Check Workflow](./.github/workflows/verify-terraform-formatting-workflow.yml): A workflow for verifing the formatting of the Terraform in the repository
 - [Terraform Plan Workflow](./.github/workflows/terraform-plan-workflow.yml): A workflow for generating a Terrform plan via `terraform plan`
-- [Verify Terraform Formatting Workflow](./.github/workflows/terraform-apply-workflow.yml): A workflow for verifing the formatting of the Terraform in the repository
 
 # Contributing, Bug Fixes, and Enhancements
 Instead of boiling the ocean, so to speak, these workflows have started off in the most basic and simpilest fashion.
