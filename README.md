@@ -6,7 +6,7 @@ The goal is to limit rediction that can occur through abstraction while still ha
 ## .NET Workflows
 Documentation for all reusable workflows that target .NET can be found in the [`dotnet`](./dotnet/) folder of this repository.
 The currently available reusable workflows are:
-- [Build App Workflow](./.github/workflows/dotnet-build-app-workflows.yml): A workflow that builds, tests, and publishes artifacts for a .NET application
+- [Build App Workflow](./.github/workflows/dotnet-build-app-workflow.yml): A workflow that builds, tests, and publishes artifacts for a .NET application
 - [Verify Code Style Workflow](./.github/workflows/dotnet-verify-code-style-workflow.yml): A workflow for validating .NET code styles
 
 ## Azure Workflows
