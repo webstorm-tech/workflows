@@ -7,7 +7,7 @@ This is a simple workflow that uses Terraform Cloud to run `terraform apply`.
 ```yaml
 terraformApplyJob:
   name: CD - Terraform Apply Workflow
-  uses: webstorm-tech/workflows/terraform/terraform-apply-workflow.yml@v4
+  uses: webstorm-tech/workflows/.github/workflowsterraform-apply-workflow.yml@v5
   with:
     # The path that contains the Terraform to run apply for.
     # Required: yes
@@ -26,7 +26,7 @@ If the plan is being ran as part of a pull request, it will add a comment to the
 ```yaml
 terraformPlanJob:
   name: PR - Terraform Plan Workflow
-  uses: webstorm-tech/workflows/terraform/terraform-plan-workflow.yml@v4
+  uses: webstorm-tech/workflows/.github/workflowsterraform-plan-workflow.yml@v5
   with:
     # The path that contains the Terraform to create a plan for.
     # Required: yes
@@ -44,7 +44,7 @@ If there are not issues, the workflow will succeed, otherwise it will report a f
 ```yaml
 verifyCodeStyleJob:
   name: PR - Verify Code Style Workflow
-  uses: webstorm-tech/workflows/terraform/verify-terraform-formatting-workflow.yml@v4
+  uses: webstorm-tech/workflows/.github/workflowsverify-terraform-formatting-workflow.yml@v5
   with:
     # The path that contains the Terraform to check.
     # Required: yes

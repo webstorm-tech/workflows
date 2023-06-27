@@ -15,7 +15,7 @@ Lastly, the code coverage is published as an artifact to GitHub as well.
 buildApplicationJob:
   name: CI - Build Workflow
   needs: gitVersionJob
-  uses:  webstorm-tech/workflows/dotnet/build-app-workflow.yml.yml@v4
+  uses:  webstorm-tech/.github/workflows/dotnet-build-app-workflow.yml.yml@v5
   with:
     # The name to be used when publishing the build artifacts
     # Required: yes
@@ -78,7 +78,7 @@ You can also read more about the `.editorconfig` file reading the Microsoft docu
 ```yaml
 verifyCodeStyleJob:
   name: PR - Verify Code Style Workflow
-  uses: webstorm-tech/workflows/dotnet/verify-code-style-workflow.yml@v4
+  uses: webstorm-tech/.github/workflows/dotnet-verify-code-style-workflow.yml@v5
   with:
     # The version of .NET to install onto the runner.
     # Default: 7.0.x
