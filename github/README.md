@@ -9,7 +9,7 @@ This workflow will need repository write permissions and access to the `GITHUB_T
 ```yaml
 tagRepoJob:
   name: GitHub - Tag Repo Workflow
-  uses: webstorm-tech/.github/workflows/github-tag-repo-workflow.yml@v5
+  uses: webstorm-tech/workflows/.github/workflows/github-tag-repo-workflow.yml@v5
   with:
     # The a semantic version value to tag the repository with.
     # Required: yes
