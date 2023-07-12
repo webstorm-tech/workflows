@@ -1,0 +1,30 @@
+name: Terraform Validate Workflow
+
+on:
+  workflow_call:
+    inputs:
+      workingDirectory:
+        description: The path that contains the Terraform to run validate for.
+        required: true
+        type: string
+
+jobs:
+  terraformValidateJob:
+    name: Terraform Validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Terraform Init
+        id: terraform-init-step
+        working-directory: ${{ inputs.workingDirectory }}
+        run: terraform init -backend=false
+
+      - name: Terraform Validate
+        id: terraform-validate-step
+        working-directory: ${{ inputs.workingDirectory }}
+        run: terraform validate

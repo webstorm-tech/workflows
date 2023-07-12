@@ -35,6 +35,7 @@ The currently available reusable workflows are:
 - [Terraform Apply Workflow](./.github/workflows/terraform-apply-workflow.yml): A workflow for executing `terraform apply`
 - [Terraform Formatting Check Workflow](./.github/workflows/terraform-formatting-check-workflow.yml): A workflow for verifing the formatting of the Terraform in the repository
 - [Terraform Plan Workflow](./.github/workflows/terraform-plan-workflow.yml): A workflow for generating a Terrform plan via `terraform plan`
+- [Terraform Validate Workflow](./.github/workflows/terraform-validate-workflow.yml): A workflow for verifying Terrform configuration via `terraform validate`
 
 # Contributing, Bug Fixes, and Enhancements
 Instead of boiling the ocean, so to speak, these workflows have started off in the most basic and simpilest fashion.
