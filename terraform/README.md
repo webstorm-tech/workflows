@@ -13,8 +13,9 @@ terraformApplyJob:
     # Required: yes
     workingDirectory: ''
 
-  # Needed to access the TF_API_TOKEN secret
-  secrets: inherit
+  # The Terraform API token to connect to Terraform Cloud with
+  secrets:
+    TF_API_TOKEN: ''
 ```
 
 ## Terraform Formatting Check Workflow
@@ -47,6 +48,23 @@ terraformPlanJob:
     # Required: yes
     workingDirectory: ''
 
-  # Needed to access the TF_API_TOKEN secret
-  secrets: inherit
+  # The Terraform API token to connect to Terraform Cloud with
+  secrets:
+    TF_API_TOKEN: ''
+```
+
+## Terraform Validate Workflow
+This workflow validates the Terraform files in the specified working directory.
+It peforms a `terraform init -backend=false` to initialize the directory but without accessing any backend or state resources.
+This is intended to be used as part of CI workflow or any other workflow where you need to validate the Terraform first.
+
+### Usage
+```yaml
+terraformPlanJob:
+  name: Terraform - Validate Workflow
+  uses: webstorm-tech/workflows/.github/workflows/terraform-validate-workflow.yml@v5
+  with:
+    # The path that contains the Terraform to create a plan for.
+    # Required: yes
+    workingDirectory: ''
 ```
