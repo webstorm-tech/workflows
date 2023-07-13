@@ -10,11 +10,15 @@ on:
         solutionFile:
           description: The path to the solution file to perform `dotnet build` on. Ex. `./src/MySolution.sln`.
           type: string
+        runner:
+          default: ubuntu-latest
+          description: The runner to use when executing the workflow. Defaults to `ubuntu-latest`.
+          type: string
 
 jobs:
   verifyCodeStyleJob:
     name: Verify Code Style
-    runs-on: windows-latest
+    runs-on: ${{ inputs.runner }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3

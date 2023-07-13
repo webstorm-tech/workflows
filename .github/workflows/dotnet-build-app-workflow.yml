@@ -43,6 +43,10 @@ on:
         description: The folder path that contains the project that will be published. Ex. `./src/MyWebProject`
         required: true
         type: string
+      runner:
+        default: ubuntu-latest
+        description: The runner to use when executing the workflow. Defaults to `ubuntu-latest`.
+        type: string
     secrets:
       CODECOV_TOKEN:
         description: The token used by Codecov to publish code coverage results to. This is required if `unitTestProjectFile` and `unitTestProjectFolder` are provided.
@@ -50,7 +54,7 @@ on:
 jobs:
   buildApplicationJob:
     name: .NET Build and Publish Job
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.runner }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
