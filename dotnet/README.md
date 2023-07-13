@@ -61,6 +61,11 @@ buildApplicationJob:
     # The folder path that contains the project that will be published. Ex. `./src/MyWebProject`
     publishProjectFolder: ''
 
+    # The runner to use when executing the workflow.
+    # Default: ubuntu-latest
+    # Required: no
+    runner: ''
+
   # This is required as the workflow needs access to the `CODECOV_TOKEN` secret
   # Which is needed to publish code coverate results to Codecov
   secrets:
@@ -86,6 +91,11 @@ verifyCodeStyleJob:
 
     # The path to the solution file to perform `dotnet build` on. Ex. `./src/MySolution.sln`
     solutionFile: ''
+
+    # The runner to use when executing the workflow.
+    # Default: ubuntu-latest
+    # Required: no
+    runner: ''
 ```
 
 [dotnet-format]: https://github.com/dotnet/format "dotnet/format repo"
