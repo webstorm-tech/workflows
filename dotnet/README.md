@@ -3,7 +3,10 @@
 ## Build Apps Workflow
 This workflow builds, tests, and publishes artifacts for .NET applications.
 You specify the version of .NET (which has to be a value supported by the `actions/setup-dotnet` action) and it will execute the install.
-Once .NET is setup, it will perform `dotnet build` using `semVer` as the value for the `/p:Version` and `Release` for `--configuration` flags.
+Once .NET is setup, it will attempt to add any NuGet sources specified in the `NUGET_REGISTRIES_JSON` secret.
+It uses the [Add NuGet Regisries](https://github.com/marketplace/actions/add-nuget-registries) action to safely add private sources or sources that require authentication.
+This is an optional step, so if no value is passed in, it will be skipped.
+Next, it will perform `dotnet build` using `semVer` as the value for the `/p:Version` and `Release` for `--configuration` flags.
 After a successful build and a value has been specified for both `unitTestProjectFile` and `unitTestProjectFile`, it will perform `dotnet test` on the specified unit test project.
 Code coverage will be collected in `opencover` format and submitted to Codecov if specified too.
 Next, the workflow will peform a `dotnet publish` on the specified web project.
@@ -66,10 +69,14 @@ buildApplicationJob:
     # Required: no
     runner: ''
 
-  # This is required as the workflow needs access to the `CODECOV_TOKEN` secret
-  # Which is needed to publish code coverate results to Codecov
   secrets:
+    # This is required as the workflow needs access to the token for Codecov
+    # Which is needed to publish code coverate results to Codecov
     CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+    # This is optional secret which contains all of the private NuGet soruces
+    # That need to be added to the runner so the dotnet restore is successful
+    NUGET_REGISTRIES_JSON: ${{ secrets.NUGET_REGISTRIES_JSON }}
 ```
 
 ## Verify Code Style Workflow

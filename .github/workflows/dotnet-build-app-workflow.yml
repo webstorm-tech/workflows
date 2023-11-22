@@ -50,6 +50,8 @@ on:
     secrets:
       CODECOV_TOKEN:
         description: The token used by Codecov to publish code coverage results to. This is required if `unitTestProjectFile` and `unitTestProjectFolder` are provided.
+      NUGET_REGISTRIES_JSON:
+        description: A JSON string containing the NuGet registries to use when restoring packages. Ex. `[{"name":"internal","password":"P@$$w0rd","url":"https://nuget.myfeed.local","username":"nuget-user"}]`
 
 jobs:
   buildApplicationJob:
@@ -63,6 +65,14 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: ${{ inputs.dotnetVersion }}
+
+      - name: Setup NuGet Registries
+        env:
+          SERIALIZED_NUGET_REGISTRIES: ${{ secrets.NUGET_REGISTRIES_JSON }}
+        if: ${{ env.SERIALIZED_NUGET_REGISTRIES != '' }}
+        uses: webstorm-tech/add-nuget-registry-action@v0.1.17
+        with:
+          serializedNuGetRegistries: ${{ env.SERIALIZED_NUGET_REGISTRIES }}
 
       - name: Build Projects
         run: dotnet build ${{ inputs.solutionFile }} --configuration Release --nologo /p:Version=${{ inputs.semVer }}
