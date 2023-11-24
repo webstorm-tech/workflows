@@ -45,5 +45,5 @@ jobs:
 
       - name: Verify Code Formatting
         env:
-          NO_RESTORE_FLAG: ${{ inputs.restore != 'true' && '--no-restore' || '' }}
+          NO_RESTORE_FLAG: ${{ inputs.restore == false && '--no-restore' || '' }}
         run: dotnet format ${{ inputs.solutionFile }} --severity info --verify-no-changes ${{ env.NO_RESTORE_FLAG }}
