@@ -86,6 +86,12 @@ It is highly recommended that you use an `.editorconfig` to manage your configur
 For more information on `dotnet format`, check out the [`dotnet/format`][dotnet-format] repository.
 You can also read more about the `.editorconfig` file reading the Microsoft documentation [Code-style rule options][ms-code-style] for .NET.
 
+Part of the internals for `dotnet format`, it will attempt to restore dependencies during the exeuction.
+If you have private NuGet sources, this will result in an error while running this workflow.
+The `restore` flag and the `NUGET_REGISTRIES_JSON` secret are provided to help you determine the appropriate path.
+If you simply want to turn of restore by passing the `--no-restore` flag into `dotnet format`, set the `restore` input to `false`.
+If you want to add your private NuGet sources to the runner, pass a secret into the `NUGET_REGISTRIES_JSON` that conforms to the schema as described by the [Add NuGet Registries](add-nuget-registries) action.
+
 ### Usage
 ```yaml
 verifyCodeStyleJob:
@@ -96,14 +102,24 @@ verifyCodeStyleJob:
     # Default: 7.0.x
     dotnetVersion: ''
 
-    # The path to the solution file to perform `dotnet build` on. Ex. `./src/MySolution.sln`
-    solutionFile: ''
+    # If false, the `--no-restore` flag will be passed to `dotnet format`.
+    # Default: true
+    restore: true
 
     # The runner to use when executing the workflow.
     # Default: ubuntu-latest
     # Required: no
     runner: ''
+
+    # The path to the solution file to perform `dotnet build` on. Ex. `./src/MySolution.sln`
+    solutionFile: ''
+
+  secrets:
+    # This is optional secret which contains all of the private NuGet soruces
+    # That need to be added to the runner so the restore is successful
+    NUGET_REGISTRIES_JSON: ${{ secrets.NUGET_REGISTRIES_JSON }}
 ```
 
+[add-nuget-registries]: https://github.com/marketplace/actions/add-nuget-registries
 [dotnet-format]: https://github.com/dotnet/format "dotnet/format repo"
 [ms-code-style]: https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/code-style-rule-options ".NET Code-style Rule Options"
