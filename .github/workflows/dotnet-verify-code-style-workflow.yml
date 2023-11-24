@@ -7,13 +7,20 @@ on:
           description: The version of .NET to install onto the runner.
           default: 7.0.x
           type: string
-        solutionFile:
-          description: The path to the solution file to perform `dotnet build` on. Ex. `./src/MySolution.sln`.
-          type: string
+        restore:
+          default: true
+          description: If false, the `--no-restore` flag will be passed to `dotnet format`.
+          type: boolean
         runner:
           default: ubuntu-latest
           description: The runner to use when executing the workflow. Defaults to `ubuntu-latest`.
           type: string
+        solutionFile:
+          description: The path to the solution file to perform `dotnet build` on. Ex. `./src/MySolution.sln`.
+          type: string
+    secrets:
+        NUGET_REGISTRIES_JSON:
+          description: A JSON string containing the NuGet registries to use when restoring packages. Ex. `[{"name":"internal","password":"P@$$w0rd","url":"https://nuget.myfeed.local","username":"nuget-user"}]`
 
 jobs:
   verifyCodeStyleJob:
@@ -28,5 +35,15 @@ jobs:
         with:
           dotnet-version: ${{ inputs.dotnetVersion }}
 
+      - name: Setup NuGet Registries
+        env:
+          SERIALIZED_NUGET_REGISTRIES: ${{ secrets.NUGET_REGISTRIES_JSON }}
+        if: ${{ env.SERIALIZED_NUGET_REGISTRIES != '' }}
+        uses: webstorm-tech/add-nuget-registry-action@v0.1.17
+        with:
+          serializedNuGetRegistries: ${{ env.SERIALIZED_NUGET_REGISTRIES }}
+
       - name: Verify Code Formatting
-        run: dotnet format ${{ inputs.solutionFile }} --severity info --verify-no-changes
+        env:
+          NO_RESTORE_FLAG: ${{ inputs.restore != 'true' && '--no-restore' || '' }}
+        run: dotnet format ${{ inputs.solutionFile }} --severity info --verify-no-changes ${{ env.NO_RESTORE_FLAG }}
