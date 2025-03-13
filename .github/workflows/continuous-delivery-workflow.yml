@@ -26,19 +26,19 @@ jobs:
       shortSha: ${{ steps.execute-gitversion-step.outputs.shortSha }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Install GitVersion
         id: install-gitversion-step
-        uses: gittools/actions/gitversion/setup@v0.10.2
+        uses: gittools/actions/gitversion/setup@v3.1.11
         with:
           versionSpec: '5.x'
         
       - name: Execute GitVersion
         id: execute-gitversion-step
-        uses: gittools/actions/gitversion/execute@v0.10.2
+        uses: gittools/actions/gitversion/execute@v3.1.11
 
   tagRepoMajorJob:
     name: Tag Repo w/ Major
@@ -46,7 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Create tag
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           script: |
             // *********************************************** \\
