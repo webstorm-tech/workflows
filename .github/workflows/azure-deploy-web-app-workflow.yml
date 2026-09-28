@@ -26,7 +26,7 @@ jobs:
           name: ${{ inputs.artifactName }}
           path: ${{ inputs.artifactName }}
 
-      - uses: azure/login@v1
+      - uses: azure/login@v3
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
