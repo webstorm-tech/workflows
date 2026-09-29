@@ -59,6 +59,7 @@ jobs:
     permissions:
       code-quality: write
       contents: read
+      pull-requests: read
     runs-on: ${{ inputs.runner }}
     steps:
       - name: Checkout
