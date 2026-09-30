@@ -90,7 +90,8 @@ jobs:
         uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: ${{ inputs.unitTestProjectFolder }}/coverage.cobertura.xml
+          # TODO: Update this path to be a variable for the workflow
+          files: TestResults/coverage.cobertura.xml
 
       - name: Publish .NET Application
         run: dotnet publish ${{ inputs.publishProjectFolder }}/${{ inputs.publishProjectFile }} --configuration Release --no-build --output ${{ runner.temp }}/${{ inputs.publishProjectFolder }} --nologo
