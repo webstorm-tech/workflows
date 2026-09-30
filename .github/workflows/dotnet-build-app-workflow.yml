@@ -83,7 +83,7 @@ jobs:
 
       - name: Run Unit Tests
         if: ${{ inputs.unitTestProjectFile != '' && inputs.unitTestProjectFolder != '' }}
-        run: dotnet test ${{ inputs.unitTestProjectFolder }}/${{ inputs.unitTestProjectFile }} --coverage --coverage-output coverage.cobertura.xml --coverage-output-format cobertura
+        run: dotnet test ${{ inputs.unitTestProjectFolder }}/${{ inputs.unitTestProjectFile }} --configuration Release --no-build --verbosity normal --nologo -- --coverage --coverage-output coverage.cobertura.xml --coverage-output-format cobertura
 
       - name: Collect Code Coverage
         if: ${{ inputs.unitTestProjectFile != '' && inputs.unitTestProjectFolder != '' && inputs.sendToCodecov == true }}
