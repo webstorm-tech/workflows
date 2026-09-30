@@ -36,10 +36,6 @@ buildApplicationJob:
     # Required: yes
     solutionFile: ''
 
-    # The test category or trait to use when running `dotnet test`.
-    # Default: UnitTest
-    testCategory: ''
-
     # The file name, including extension, of the project to execute tests for. Ex. `MyWebProject.Tests.proj`
     # If omitted, no tests will be run.
     # Default: ''
@@ -51,6 +47,11 @@ buildApplicationJob:
     # Default: ''
     # Required: no
     unitTestProjectFolder: ''
+
+    # The label to use for the code coverage report being sent to GitHub
+    # Default: 'coverage'
+    # Requireed: no
+    codeCoverageLabel: ''
 
     # A boolean value indicating if the code coverage results should be sent to Codecov. Defaults to `false`.
     # Default: false
