@@ -38,16 +38,16 @@ jobs:
       shortSha: ${{ steps.execute-gitversion-step.outputs.shortSha }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Install GitVersion
         id: install-gitversion-step
-        uses: gittools/actions/gitversion/setup@v3.2.1
+        uses: gittools/actions/gitversion/setup@v4.7.0
         with:
           versionSpec: '6.x'
         
       - name: Execute GitVersion
         id: execute-gitversion-step
-        uses: gittools/actions/gitversion/execute@v3.2.1
+        uses: gittools/actions/gitversion/execute@v4.7.0
